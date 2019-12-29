@@ -1,0 +1,16 @@
+Sample Usage:
+
+
+let cropper = ImageViewer()
+
+
+cropper.frame = CGRect(x: 0, y: 50, width: view.frame.width, height: view.frame.height - 100)
+cropper.setupViews()
+
+//MARK: - Optional Params
+Cropping Style
+Overlay Color
+
+view.addSubview(cropper)
+
+
