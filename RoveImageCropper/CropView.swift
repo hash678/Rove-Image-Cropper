@@ -56,6 +56,11 @@ class CropView:UIView{
         }
     }
     
+    var overlayHeight:CGFloat = 100 {
+        didSet{
+            self.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: overlayHeight)
+        }
+    }
     
     
     
