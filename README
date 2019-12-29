@@ -8,9 +8,24 @@ cropper.frame = CGRect(x: 0, y: 50, width: view.frame.width, height: view.frame.
 cropper.setupViews()
 
 //MARK: - Optional Params
+
 Cropping Style
+cropper.croppingStyle
+
 Overlay Color
+cropper.color
+
 
 view.addSubview(cropper)
 
+//MARK: To crop
+ cropper.cropImage() {[weak self] (image) in
+            guard let image = image else{
+                print("Couldn't crop image")
+                return
+            }
+            self?.cropper.loadImage(image: image)
+           
+        }
+    }
 
