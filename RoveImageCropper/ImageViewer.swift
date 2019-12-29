@@ -164,7 +164,7 @@ class ImageViewer:UIView{
         self.addSubview(overlay)
         
         
-        loadImage(image: #imageLiteral(resourceName: "TestImage"))
+        //loadImage(image: #imageLiteral(resourceName: "TestImage"))
         
     }
     
