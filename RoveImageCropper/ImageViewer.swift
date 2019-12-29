@@ -17,7 +17,7 @@ class ImageViewer:UIView{
     var croppingStyle:CroppingStyle = CroppingStyle.KeepAreaBetween{
         
         didSet{
-            color = croppingStyle == CroppingStyle.KeepAreaBetween ? #colorLiteral(red: 0.5563425422, green: 0.9793455005, blue: 0, alpha: 1) : #colorLiteral(red: 0.3176470697, green: 0.07450980693, blue: 0.02745098062, alpha: 1)
+            color = croppingStyle == CroppingStyle.KeepAreaBetween ? #colorLiteral(red: 0.5563425422, green: 0.9793455005, blue: 0, alpha: 1) : #colorLiteral(red: 1, green: 0.1491314173, blue: 0, alpha: 1)
         }
     }
     
@@ -30,8 +30,8 @@ class ImageViewer:UIView{
     
     fileprivate let model = Cropper()
     fileprivate var imageScaleFactor:CGFloat = 1
-    fileprivate var imageStartY:CGFloat?
-    fileprivate var imageEndY:CGFloat?
+    //fileprivate var imageStartY:CGFloat?
+   // fileprivate var imageEndY:CGFloat?
     
     fileprivate var scrollScaleFactor:CGFloat = 1
     fileprivate var scrollTranslation:CGFloat = 0
@@ -71,53 +71,58 @@ class ImageViewer:UIView{
     fileprivate func getScaleFactor() -> CGFloat{
         
         let image = imageView.image!
-        let width = imageView.frame.width
-        let height = imageView.frame.height
+        //let width = imageView.frame.width
+        //let height = imageView.frame.height
         
-        let imageWidth = image.size.width
+        //let imageWidth = image.size.width
         let imageHeight = image.size.height
-        let widthBigger = imageWidth > imageHeight
+        //let widthBigger = imageWidth > imageHeight
         
-        
-        let newImageHeight = widthBigger ? (imageHeight/imageWidth * width) : height
+        let newImageHeight = imageView.getScaledImageSize()!.height
+
+        //let newImageHeight = widthBigger ? (imageHeight/imageWidth * width) : height
         let imageCenterY = imageView.center.y
-        imageStartY = imageCenterY - (newImageHeight / 2)
-        imageEndY = imageCenterY + (newImageHeight / 2)
-        
-        overlay.imageMaxY = imageEndY
-        overlay.imageMinY = imageStartY
+     
         
         
-        return (widthBigger ? width / imageWidth : height / imageHeight)
+         overlay.imageMinY = imageCenterY - (newImageHeight / 2)
+        overlay.imageMaxY = imageCenterY + (newImageHeight / 2)
+        
+
+        //print("ImageStartY \(imageStartY!)")
+        
+        //overlay.imageMaxY = imageEndY
+       // overlay.imageMinY = imageStartY
+        
+        return newImageHeight/imageHeight
+        //return (widthBigger ? width / imageWidth : height / imageHeight)
     }
     
     
     fileprivate func calculateImageStartEnd(){
-        
-        let image = imageView.image!
-        let width = imageView.frame.width
-        let height = imageView.frame.height
-        
-        let imageWidth = image.size.width
-        let imageHeight = image.size.height
-        
-        print("ImageWidth \(imageWidth) ImageHeight \(imageHeight) ImageView Height \(height)")
-        
-        let widthBigger = imageWidth > imageHeight
+            
+           //let image = imageView.image!
+           //let width = imageView.frame.width
+           //let height = imageView.frame.height
+           
+          // let imageWidth = image.size.width
+          // let imageHeight = image.size.height
+           //let widthBigger = imageWidth > imageHeight
+           
+           let newImageHeight = imageView.getScaledImageSize()!.height
 
+           //let newImageHeight = widthBigger ? (imageHeight/imageWidth * width) : height
+           let imageCenterY = imageView.center.y
         
+           
+           
+           overlay.imageMinY = imageCenterY - (newImageHeight / 2) - scrollTranslation
+           overlay.imageMaxY  = imageCenterY + (newImageHeight / 2) - scrollTranslation
+         
+           
         
-        let newImageHeight = widthBigger ? (imageHeight/imageWidth * width) : height
-        let imageCenterY = imageView.center.y
-
-        
-        
-        overlay.imageMaxY = imageCenterY + (newImageHeight / 2)
-        overlay.imageMinY = imageCenterY - (newImageHeight  / 2)
-        
-        
-      
-        
+         
+           
     }
     
     func loadImage(image:UIImage) {
@@ -127,8 +132,9 @@ class ImageViewer:UIView{
         scrollScaleFactor = 1
         scrollTranslation = 0
         imageScaleFactor = getScaleFactor()
+        overlay.overlayHeight = 100
         overlay.center = imageView.center
-        
+       
     }
     
     
@@ -152,7 +158,7 @@ class ImageViewer:UIView{
         
         self.setNeedsLayout()
         self.layoutIfNeeded()
-        imageView.frame = scrollView.frame
+        imageView.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
         
         
         
@@ -172,8 +178,8 @@ class ImageViewer:UIView{
         
         let image:UIImage?
 
-        let y1 = model.getBarPos(yPos: overlay.topY, imageScaleFactor: imageScaleFactor / scrollScaleFactor, imageStartY: imageStartY! - scrollTranslation)
-        let y2 = model.getBarPos(yPos: overlay.bottomY, imageScaleFactor:  imageScaleFactor / scrollScaleFactor, imageStartY: imageStartY! - scrollTranslation)
+        let y1 = model.getBarPos(yPos: overlay.topY, imageScaleFactor: imageScaleFactor / scrollScaleFactor, imageStartY:  overlay.imageMinY!)
+        let y2 = model.getBarPos(yPos: overlay.bottomY, imageScaleFactor:  imageScaleFactor / scrollScaleFactor, imageStartY:  overlay.imageMinY!)
         
         
         
@@ -225,14 +231,14 @@ extension ImageViewer:UIScrollViewDelegate{
         
     }
     
-    fileprivate func calculateNewHeight() -> CGFloat{
-        let imageHeight = (imageEndY! - imageStartY!) / scrollScaleFactor
-        return imageHeight
-        
-    }
+//    fileprivate func calculateNewHeight() -> CGFloat{
+//        let imageHeight = (imageEndY! - imageStartY!) / scrollScaleFactor
+//        return imageHeight
+//
+//    }
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         calculateImageStartEnd()
-
+        
         print("ScrollView translated \(scrollView.contentOffset)")
         scrollTranslation = scrollView.contentOffset.y
     }
@@ -243,4 +249,17 @@ enum CroppingStyle{
     
     case KeepAreaBetween
     case RemoveAreaBetween
+}
+
+
+extension UIImageView {
+    /// Retrieve the scaled size of the image within this ImageView.
+    /// - Returns: A CGRect representing the size of the image after scaling or nil if no image is set.
+    func getScaledImageSize() -> CGRect? {
+        if let image = self.image {
+            return AVMakeRect(aspectRatio: image.size, insideRect: self.frame);
+        }
+
+        return nil;
+    }
 }
