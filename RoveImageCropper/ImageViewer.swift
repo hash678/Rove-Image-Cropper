@@ -51,7 +51,7 @@ class ImageViewer:UIView{
     
     
     fileprivate lazy var imageView:UIImageView = {
-        let v = UIImageView(image: #imageLiteral(resourceName: "TestImage"))
+        let v = UIImageView()
         // v.translatesAutoresizingMaskIntoConstraints = false
         v.contentMode = .scaleAspectFit
         v.backgroundColor = .black
