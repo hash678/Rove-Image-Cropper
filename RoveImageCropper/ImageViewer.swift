@@ -132,9 +132,10 @@ class ImageViewer:UIView{
         scrollScaleFactor = 1
         scrollTranslation = 0
         imageScaleFactor = getScaleFactor()
-        overlay.overlayHeight = 100
-        overlay.center = imageView.center
+
        
+        overlay.center = imageView.center
+        
     }
     
     
@@ -174,7 +175,7 @@ class ImageViewer:UIView{
         
     }
     
-    func cropImage( completionHandler: (UIImage?) -> Void){
+    func cropImage( completionHandler: (UIImage?,Cropping?) -> Void) {
         
         let image:UIImage?
 
@@ -185,18 +186,21 @@ class ImageViewer:UIView{
         
         if croppingStyle == .RemoveAreaBetween{
             image = model.removeAreaInBetween(image: imageView.image!, y1: y1, y2: y2)
-            completionHandler(image)
+            
+            let cropping = Cropping(y1: Float(y1), y2: Float(y2), cropType: croppingStyle.rawValue)
+            completionHandler(image,cropping)
             return
         }else{
             let cgImage = model.cropImage(image: imageView.image!, y1: y1, y2: y2)
             
             if let cgImage = cgImage{
-                completionHandler(UIImage(cgImage: cgImage))
+                let cropping = Cropping(y1:  Float(y1), y2: Float(y2), cropType: croppingStyle.rawValue)
+                completionHandler(UIImage(cgImage: cgImage),cropping)
                 return
             }
         }
         
-      completionHandler(nil)
+      completionHandler(nil,nil)
         
     }
     
@@ -245,12 +249,20 @@ extension ImageViewer:UIScrollViewDelegate{
 }
 
 
-enum CroppingStyle{
+enum CroppingStyle:String{
     
     case KeepAreaBetween
     case RemoveAreaBetween
 }
 
+
+struct Cropping{
+    var y1:Float
+    var y2:Float
+    var cropType:String?
+    
+    
+}
 
 extension UIImageView {
     /// Retrieve the scaled size of the image within this ImageView.
@@ -263,3 +275,5 @@ extension UIImageView {
         return nil;
     }
 }
+
+
