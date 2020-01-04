@@ -16,7 +16,7 @@ Copy the project's classes to your own project.
 
 ### Sample Usage:
 
-
+```
 let cropper = ImageViewer()
 
 
@@ -46,7 +46,7 @@ view.addSubview(cropper)
     }
 
 
-
+```
 
 ## Built With
 
